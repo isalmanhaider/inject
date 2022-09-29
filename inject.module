@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Adds ld+json code snippet to article nodes.
+ */
+
+use Drupal\Core\Url;
+use Drupal\taxonomy\Entity\Term;
+
+/**
+ * Implements hook_preprocess_page.
+ */
+function inject_preprocess_page(&$variables) {
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if (isset($node)) {
+    if ($node->getType() == "article") {
+      // Just in case if the article image is not uploaded - since the field is optional.
+      $imageurl = NULL;
+      if (isset($node->field_image->entity)) {
+        $imageurl = file_create_url($node->field_image->entity->getFileUri());
+      }
+      $url_alias = Url::fromRoute('<current>')->toString();
+      $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => ucfirst($node->getType()),
+        'title' => $node->title->value,
+        'summary' => $node->body->summary,
+        'image' => $imageurl,
+        'tags' => Term::load($node->field_tags->target_id)->get('name')->value,
+        'datePublished' => date('Y-m-d\TH:i:s', $node->created->value),
+        'dateModified' => date('Y-m-d\TH:i:s', $node->changed->value),
+        'url_alias' => $url_alias,
+        'author' => [
+          '@type' => $node->getOwner()->getRoles(),
+          'name' => $node->getOwner()->name->value,
+          'url' => Url::fromRoute('entity.user.canonical', ['user' => $node->uid->target_id])->toString(),
+        ],
+      ];
+      $tag = [
+        '#type' => 'html_tag',
+        '#tag' => 'script',
+        '#attributes' => [
+          'type' => 'application/ld+json',
+        ],
+        '#value' => json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+      ];
+      $variables['#attached']['html_head'][] = [$tag, 'structured_data_json'];
+    }
+  }
+}

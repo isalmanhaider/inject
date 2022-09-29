@@ -1,0 +1,11 @@
+name: 'Inject for Article Nodes'
+description: 'Custom module to inject ld+JSON and JS on article node pages'
+type: module
+core_version_requirement: ^9
+configure: inject.settings
+package: 'Custom'
+dependencies:
+  - drupal:node
+
+version: 1.0
+project: 'inject'
