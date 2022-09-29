@@ -15,7 +15,10 @@ function inject_preprocess_page(&$variables) {
   $node = \Drupal::routeMatch()->getParameter('node');
   if (isset($node)) {
     if ($node->getType() == "article") {
-      $variables['#attached']['library'][] = 'inject/inject-js';
+      $inject_config = \Drupal::config('inject.settings');
+      if ($inject_config->get('allow_js_injection') == true) {
+          $variables['#attached']['library'][] =  'inject/inject-js';
+      }
       // Just in case if the article image is not uploaded - since the field is optional.
       $imageurl = NULL;
       if (isset($node->field_image->entity)) {

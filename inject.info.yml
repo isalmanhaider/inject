@@ -1,4 +1,4 @@
-name: 'Inject for Article Nodes'
+name: 'Inject for Article nodes'
 description: 'Custom module to inject ld+JSON and JS on article node pages'
 type: module
 core_version_requirement: ^9

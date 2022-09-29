@@ -1,0 +1,7 @@
+inject.settings:
+  type: config_object
+  label: 'JS injection settings'
+  mapping:
+    allow_js_injection:
+      type: boolean
+      label: 'Allow JS injection'

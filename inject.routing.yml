@@ -1,0 +1,9 @@
+inject.settings:
+  path: '/admin/config/inject/settings'
+  defaults:
+    _form: '\Drupal\inject\Form\InjectSettingsForm'
+    _title: 'Inject Settings Form'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
