@@ -1,0 +1,5 @@
+inject.admin:
+  title: 'Inject Settings'
+  description: 'Toggle JS loading functionality.'
+  parent: system.admin_config_search
+  route_name: inject.settings

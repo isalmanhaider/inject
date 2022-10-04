@@ -16,27 +16,33 @@ function inject_preprocess_page(&$variables) {
   if (isset($node)) {
     if ($node->getType() == "article") {
       $inject_config = \Drupal::config('inject.settings');
-      if ($inject_config->get('allow_js_injection') == true) {
-          $variables['#attached']['library'][] =  'inject/inject-js';
+      if ($inject_config->get('allow_js_injection') == TRUE) {
+        $variables['#attached']['library'][] = 'inject/inject-js';
       }
       // Just in case if the article image is not uploaded - since the field is optional.
-      $imageurl = NULL;
+      $image = NULL;
       if (isset($node->field_image->entity)) {
         $imageurl = file_create_url($node->field_image->entity->getFileUri());
+        [$width, $height] = getimagesize($imageurl);
+        $image = [
+          'src' => $imageurl,
+          'width' => $width . "px",
+          'height' => $height . "px",
+        ];
       }
       $url_alias = Url::fromRoute('<current>')->toString();
       $schema = [
         '@context' => 'https://schema.org',
         '@type' => ucfirst($node->getType()),
-        'title' => $node->title->value,
-        'summary' => $node->body->summary,
-        'image' => $imageurl,
+        'title' => preg_replace('/[[:^print:]]/', '', $node->title->value),
+        'summary' => ($node->body->summary) ? $node->body->summary : substr(strip_tags($node->body->value), 0, 90) . " ...",
+        'image' => $image,
         'tags' => Term::load($node->field_tags->target_id)->get('name')->value,
         'datePublished' => date('Y-m-d\TH:i:s', $node->created->value),
         'dateModified' => date('Y-m-d\TH:i:s', $node->changed->value),
         'url_alias' => $url_alias,
         'author' => [
-          '@type' => $node->getOwner()->getRoles(),
+          '@type' => 'AUSEDU',
           'name' => $node->getOwner()->name->value,
           'url' => Url::fromRoute('entity.user.canonical', ['user' => $node->uid->target_id])->toString(),
         ],
